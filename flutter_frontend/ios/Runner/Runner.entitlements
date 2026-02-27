@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	  Xcode typically sets this when you enable "Push Notifications" capability under
+	  Signing & Capabilities. Keep this file in source control so CI/build agents have it.
+	  Valid values: development / production (set by Xcode & signing).
+	-->
+	<key>aps-environment</key>
+	<string>development</string>
+</dict>
+</plist>

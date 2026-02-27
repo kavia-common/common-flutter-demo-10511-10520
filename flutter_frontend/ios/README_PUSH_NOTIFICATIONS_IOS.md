@@ -4,143 +4,85 @@ This Flutter project uses:
 - `firebase_messaging` for FCM/APNs push notifications
 - `flutter_local_notifications` for foreground/local notifications
 
-## Current repo state
-The `ios/` folder is currently missing from the repository, so iOS cannot be configured/compiled here until it is re-generated or added back.
-
-If you previously had an iOS Runner, **restore/commit** your `ios/` directory, or regenerate it with:
-
-```bash
-flutter create .
-```
-
-(Do this in `common-flutter-demo-10511-10520/flutter_frontend/`.)
-
-After the `ios/` folder exists, apply the steps below.
+As of this commit, a real `ios/Runner` project exists and includes baseline native configuration. You still must perform a few manual Firebase/Xcode steps (below) because Apple signing/capabilities and Firebase config files cannot be fully generated from code alone.
 
 ---
 
 ## 1) Add Firebase config file (required)
+
 Download **GoogleService-Info.plist** from Firebase Console and place it at:
 
 `ios/Runner/GoogleService-Info.plist`
 
-Also ensure it is added to the Runner target in Xcode (it must appear under Runner in the project navigator).
+Then in Xcode:
+- Open `ios/Runner.xcworkspace`
+- Ensure `GoogleService-Info.plist` is added to the **Runner** target (File Inspector → Target Membership).
+
+The iOS `AppDelegate.swift` calls `FirebaseApp.configure()` and expects this file to be present.
 
 ---
 
-## 2) Info.plist keys (required for local notifications / permissions)
-Edit:
-
-`ios/Runner/Info.plist`
-
-Add (or ensure) these keys exist:
-
-- `NSUserNotificationUsageDescription` (optional but recommended; iOS may show system prompts depending on iOS version/features)
-- `UIBackgroundModes` includes `remote-notification` (recommended for background message handling / silent pushes)
-
-Example snippet:
-
-```xml
-<key>UIBackgroundModes</key>
-<array>
-  <string>remote-notification</string>
-</array>
-```
-
-Notes:
-- For iOS push notifications, permission is requested at runtime by `FirebaseMessaging.instance.requestPermission(...)` (already present in Dart code via `FcmService`).
-
----
-
-## 3) AppDelegate setup (Firebase + APNs token bridging)
-Open:
-
-`ios/Runner/AppDelegate.swift` (or `AppDelegate.m` for Obj-C)
-
-### Swift (typical modern Flutter template)
-Ensure it contains Firebase initialization and notification delegation hooks.
-
-Minimum expected shape (illustrative):
-
-```swift
-import UIKit
-import Flutter
-import FirebaseCore
-
-@UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate {
-  override func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-  ) -> Bool {
-    FirebaseApp.configure()
-
-    // Required for plugin registration
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
-  }
-}
-```
-
-Additional notes:
-- `firebase_messaging` typically handles most wiring automatically, but Firebase initialization (`FirebaseApp.configure()`) is required when not using generated firebase options.
-- If you use `flutterfire configure`, it may generate different code paths (e.g., `FirebaseApp.configure()` still required, but options handled via generated files).
-
----
-
-## 4) Capabilities / Entitlements (MANUAL Xcode steps required)
-These cannot be fully enabled via text files alone because they depend on Xcode project signing.
+## 2) App capabilities (MANUAL Xcode steps required)
 
 In Xcode:
 1. Open `ios/Runner.xcworkspace`
-2. Select `Runner` target → **Signing & Capabilities**
-3. Add capabilities:
-   - **Push Notifications**
-   - **Background Modes** → enable **Remote notifications**
+2. Select **Runner** target → **Signing & Capabilities**
+3. Add capability: **Push Notifications**
+4. Add capability: **Background Modes** and enable:
+   - **Remote notifications**
 
-This will update:
-- `Runner.entitlements` (created/modified by Xcode)
-- project capabilities metadata
-
-### If `Runner.entitlements` exists, it should contain at least:
-- `aps-environment` (value: `development` or `production` depending on build)
-
-Xcode usually manages this automatically.
+Notes:
+- This typically creates/updates `Runner.entitlements` and sets `aps-environment`.
+- This also requires a valid Apple Developer Team and correct provisioning profiles.
 
 ---
 
-## 5) APNs key/cert + Firebase Console mapping (MANUAL)
-To receive push notifications on iOS:
-1. In Apple Developer portal: create an **APNs Auth Key** (recommended) or certificates
-2. In Firebase Console → Project Settings → Cloud Messaging:
+## 3) APNs key/cert + Firebase Console mapping (MANUAL)
+
+To receive remote push notifications on iOS devices:
+
+1. Apple Developer portal:
+   - Create an **APNs Auth Key** (recommended) *or* APNs certificates.
+2. Firebase Console → Project Settings → Cloud Messaging:
    - Upload APNs Auth Key (or certificates)
-   - Ensure your iOS bundle id matches the app’s bundle id
+   - Ensure your iOS bundle id matches your app’s bundle id (Xcode Runner target → General → Bundle Identifier)
 
 ---
 
-## 6) CocoaPods install (required after adding Firebase)
-From `ios/` directory:
+## 4) Info.plist keys already included
+
+`ios/Runner/Info.plist` includes:
+- `NSUserNotificationUsageDescription`
+- `UIBackgroundModes` with `remote-notification`
+
+Permission is still requested at runtime by Dart code (`FirebaseMessaging.instance.requestPermission(...)`).
+
+---
+
+## 5) CocoaPods install (required)
+
+From `common-flutter-demo-10511-10520/flutter_frontend/ios`:
 
 ```bash
 pod repo update
 pod install
 ```
 
-Then open `Runner.xcworkspace` (not `.xcodeproj`).
+Then always open:
+- `ios/Runner.xcworkspace` (not `Runner.xcodeproj`)
 
 ---
 
-## 7) Testing notes
-- Simulator: APNs push notifications generally require a real device (especially for remote push).
-- Foreground notifications: this project shows notifications in foreground via `flutter_local_notifications` (already implemented in Dart).
-- Background handler: Dart already registers `FirebaseMessaging.onBackgroundMessage(...)`.
+## 6) Testing notes
+
+- Remote push notifications require a **real iOS device** (simulator support is limited and depends on iOS version; do not rely on it).
+- Foreground notifications are displayed via `flutter_local_notifications` (already implemented in Dart).
+- Background handler is registered via `FirebaseMessaging.onBackgroundMessage(...)` (already in Dart).
 
 ---
 
-## What is already handled by Dart code
-The existing Dart implementation:
-- Initializes Firebase on startup (`Firebase.initializeApp()`)
-- Registers a background handler
-- Requests notification permissions
-- Uses `flutter_local_notifications` for foreground display
+## Troubleshooting tips
 
-So after the iOS native setup above, **no Dart changes should be required**.
+- If pods fail due to iOS minimum version, keep `platform :ios, '12.0'` (or raise it if required by plugin versions).
+- If you see Firebase not configured errors, confirm `GoogleService-Info.plist` is in `ios/Runner/` and included in the Runner target.
+- If token/APNs issues occur, confirm Push Notifications capability is enabled and provisioning profiles include it.
