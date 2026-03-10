@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/opt/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/opt/android-sdk-linux/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/kavia/workspace/code-generation/common-flutter-demo-10511-10520/common-flutter-demo/android/app/.cxx/Debug/1k4h6o1c/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/opt/android-sdk-linux/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/kavia/workspace/code-generation/common-flutter-demo-10511-10520/common-flutter-demo/android/app/.cxx/Debug/1k4h6o1c/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}

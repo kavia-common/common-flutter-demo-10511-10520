@@ -42,3 +42,36 @@ flutter {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22"
 }
+
+/**
+ * Ensure the debug APK exists at the path expected by the preview tooling:
+ *   <flutter_project>/build/app/outputs/flutter-apk/app-debug.apk
+ *
+ * Flutter's Android build produces the APK under:
+ *   <flutter_project>/android/app/build/outputs/flutter-apk/app-debug.apk
+ *
+ * This task copies the generated APK after a debug build completes.
+ */
+def flutterProjectRoot = file("../..")
+def previewExpectedApkDir = new File(flutterProjectRoot, "build/app/outputs/flutter-apk")
+def previewExpectedApkFile = new File(previewExpectedApkDir, "app-debug.apk")
+def androidFlutterApkFile = file("$buildDir/outputs/flutter-apk/app-debug.apk")
+
+tasks.register("syncDebugApkToFlutterBuildDir", Copy) {
+    group = "flutter"
+    description = "Copy debug APK to Flutter root build/app/outputs/flutter-apk/app-debug.apk for preview tooling."
+
+    // Only do work if the Android-side APK exists.
+    onlyIf {
+        androidFlutterApkFile.exists()
+    }
+
+    from(androidFlutterApkFile)
+    into(previewExpectedApkDir)
+    rename { "app-debug.apk" }
+}
+
+// Run the sync after standard debug build tasks.
+tasks.matching { it.name == "assembleDebug" || it.name == "packageDebug" }.configureEach {
+    finalizedBy("syncDebugApkToFlutterBuildDir")
+}
