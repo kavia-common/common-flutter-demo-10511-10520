@@ -1,0 +1,2 @@
+/home/kavia/workspace/code-generation/common-flutter-demo-10511-10520/common-flutter-demo/android/app/.cxx/RelWithDebInfo/6t356l1y/arm64-v8a/CMakeFiles/edit_cache.dir
+/home/kavia/workspace/code-generation/common-flutter-demo-10511-10520/common-flutter-demo/android/app/.cxx/RelWithDebInfo/6t356l1y/arm64-v8a/CMakeFiles/rebuild_cache.dir

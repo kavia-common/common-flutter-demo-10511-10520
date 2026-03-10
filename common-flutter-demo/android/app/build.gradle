@@ -8,12 +8,13 @@ android {
     namespace "com.example.common_flutter_demo"
 
     // Use explicit values instead of the legacy `flutter.*` ext values that were provided by flutter.gradle.
-    compileSdk 34
+    // Required by some Flutter plugins (e.g., local_auth_android) which now require compileSdk 35+.
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.example.common_flutter_demo"
         minSdk 21
-        targetSdk 34
+        targetSdk 35
         versionCode 1
         versionName "1.0.0"
     }
