@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Flutter Android embedding requires these themes when referenced by AndroidManifest.xml:
+      - @style/LaunchTheme for the launch Activity theme
+      - @style/NormalTheme provided via io.flutter.embedding.android.NormalTheme meta-data
+    -->
+
+    <style name="LaunchTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <!-- Display the native splash background while Flutter initializes. -->
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <!-- After Flutter is ready, the embedding switches to this theme. -->
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+</resources>
