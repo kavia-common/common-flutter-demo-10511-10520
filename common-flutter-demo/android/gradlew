@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Minimal Gradle wrapper bootstrap script placeholder.
+# In CI environments, `flutter build apk` invokes Gradle via the wrapper tooling.
+exec gradle "$@"
