@@ -39,5 +39,5 @@ flutter {
 }
 
 dependencies {
-    // No additional dependencies needed for scaffold.
+    implementation "androidx.biometric:biometric:1.2.0-alpha05"
 }
